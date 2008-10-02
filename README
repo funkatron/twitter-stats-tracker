@@ -1,0 +1,4 @@
+This is the application directory for a CodeIgniter app. You'll need to set up your index.php file in the doc root as set 
+paths appropriately.
+
+You'll also want to make cache/ and logs/ dirs in this directory, and make them writable by the user PHP is executing as.
