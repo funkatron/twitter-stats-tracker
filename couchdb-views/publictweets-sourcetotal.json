@@ -1,0 +1,10 @@
+{
+    "_id": "_design\/sourcetotal",
+    "_rev": "4116948277",
+    "views": {
+        "total": {
+            "map": "function(doc) { emit(doc.source, 1); }",
+            "reduce": "function(key,values) { return sum(values); }"
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "_id": "_design\/rank",
+    "_rev": "643897748",
+    "language": "javascript",
+    "views": {
+        "byminute": {
+            "map": "function(doc) {\n  d = new Date(doc.unixtime*1000);\n  emit([d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), doc.name, doc.url], doc.rank);\n}",
+            "reduce": "function(key, values) {\n  return sum(values);\n}"
+        },
+        "byhour": {
+            "map": "function(doc) {\n  d = new Date(doc.unixtime*1000);\n  emit([d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), doc.name, doc.url], doc.rank);\n}",
+            "reduce": "function(key, values) {\n  return sum(values);\n}"
+        },
+        "byday": {
+            "map": "function(doc) {\n  d = new Date(doc.unixtime*1000);\n  emit([d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), doc.name, doc.url], doc.rank);\n}",
+            "reduce": "function(key, values) {\n  return sum(values);\n}"
+        },
+        "bymonth": {
+            "map": "function(doc) {\n  d = new Date(doc.unixtime*1000);\n  emit([d.getUTCFullYear(), d.getUTCMonth(), doc.name, doc.url], doc.rank);\n}",
+            "reduce": "function(key, values) {\n  return sum(values);\n}"
+        },
+        "bydayofweek": {
+            "map": "function(doc) {\n  d = new Date(doc.unixtime*1000);\n  emit([d.getUTCFullYear(), d.getUTCDay(), doc.name, doc.url], doc.rank);\n}",
+            "reduce": "function(key, values) {\n  return sum(values);\n}"
+        }
+    }
+}

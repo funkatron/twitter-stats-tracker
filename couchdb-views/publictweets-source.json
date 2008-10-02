@@ -1,0 +1,10 @@
+{
+    "_id": "_design\/source",
+    "_rev": "2469757736",
+    "language": "javascript",
+    "views": {
+        "byday": {
+            "map": "function(doc) {\n  d = new Date(doc.created_at);\n  emit([d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), doc.source], 1);\n}"
+        }
+    }
+}
