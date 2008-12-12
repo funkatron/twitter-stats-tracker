@@ -16,6 +16,14 @@
 			padding:0;
 			margin:0;
 		}
+		
+		
+		A:link, .clickable {
+			color: #00C;
+			text-decoration: underline;
+			cursor:pointer;
+		}
+		
 		#container {
 			margin-left:auto;
 			margin-right:auto;
@@ -83,6 +91,22 @@
 			
 			line-height:1.5em;
 		}
+
+		#adsense {
+			font-size:9pt;
+			padding:10px;
+			margin:10px;
+			background-color:#CCCCFF;
+			border-top:3px double #333333;
+			border-bottom:3px double #333333;
+			
+			color:#000000;
+			margin-left:auto;
+			margin-right:auto;
+			width:500px;
+			
+			line-height:1.5em;
+		}
 		
 		#ad {
 			font-size:9pt;
@@ -100,10 +124,31 @@
 			line-height:1.5em;
 		}
 		
+		#terms-links {
+			margin-left:auto;
+			margin-right:auto;
+			width:500px;
+		}
+		
 		#note p+p {
 /*			padding:5px 0 0 0 ;*/
 			margin: .5em 0 0 0;
 		}
+		
+		#comparisons {
+			line-height:1.5em;
+		}
+		label { margin-right: .2em;}
+		#compare {
+			width:300px;
+		}
+		#compare-notes {
+			font-style: italic;
+			font-size:10pt;
+			color:#666;
+		}
+
+		
 	</style>
 	
 	<style type="text/css" media="screen">

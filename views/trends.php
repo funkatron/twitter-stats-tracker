@@ -29,6 +29,44 @@
 		
 	
 		<div id="chart"><img src="<?php echo $chart_url?>" /></div>
+		<!--  -->
+
+		<div id="adsense">
+			<script type="text/javascript"><!--
+			google_ad_client = "pub-7378172068209306";
+			/* Twitter Stats Topics 468x15, created 10/16/08 */
+			google_ad_slot = "9098091585";
+			google_ad_width = 468;
+			google_ad_height = 15;
+			//-->
+			</script>
+			<script type="text/javascript"
+			src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+			</script>
+			<script type="text/javascript"><!--
+			// google_ad_client = "pub-7378172068209306";
+			// /* Twitter Stats 468x60 */
+			// google_ad_slot = "7756658761";
+			// google_ad_width = 468;
+			// google_ad_height = 60;
+			//-->
+			</script>
+			<!-- <script type="text/javascript"
+			src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+			</script> -->
+		</div>
+
+		<?php if (isset($terms) && is_array($terms) && count($terms)>0): ?>
+			<div id="terms-links">
+				<h3>Search Twitter for…</h3>
+				<ul>
+					<?php foreach ($terms as $value): ?>
+						<li><a href="http://search.twitter.com/search?q=<?=urldecode($value)?>" target="_blank" title="Search for post containing &quot;<?=urldecode($value)?>&quot;"><?=urldecode($value)?></a></li>
+					<?php endforeach ?>
+				</ul>
+
+			</div>			
+		<?php endif ?>
 
 		<div id="note">
 		This data is derived from the Twitter Trends API method. Samples are taken every 5 minutes. Data collection began on 2008-09-23.<p />
@@ -51,23 +89,99 @@
 		</div>
 
 
-		<table id="full-list" class="tablesorter">
-			<thead>
-			<tr>
-				<th>Term</th>
-				<th>%</th>
-			</tr>
-			</thead>
-			<tbody>
-			<?foreach($source_counts as $key=>$val):?>
-			<tr>
-				<td><?=$key?> [<a title="Search for post containing &quot;<?=$key?>&quot;" href="http://search.twitter.com/search?q=<?=urlencode($key)?>" target="_blank">search</a>]</td>
-				<td><?=number_format(($val/$sources_total)*100, 3)?>%</td>
-			</tr>
-			<?endforeach;?>
-			</tbody>
-		</table>
+		<?php if (isset($source_counts) && is_array($source_counts) && sizeof($source_counts)>0): ?>
+			<script type="text/javascript" charset="utf-8">
+				$().ready( function() {
+				
+					$('input#compare').val(''); // blank this out to get rid of firefox "memory"
+				
+					$('A.compare-link').click( function(e) {
+						e.stopPropagation();
+						var id = e.target.id;
+						var term = id.replace(/--term-/, '');
+						if (term) {
+							showCompare();
+							addTerm(term);
+						} 
+					} );
+				
+					$('form#compare-form').bind('submit', function() {
+						compare();
+					});
+					$('input#submit').bind('click', function() {
+						compare();
+					});
+				} );
+			
+			
+				function showCompare() {
+					if ($('#comparisons:hidden').length>0) {
+						$('#comparisons').fadeIn('500');
+					}
+				
+				}
+			
+				function addTerm(term) {
+					var current_terms = $('#compare').val();
+					if (current_terms.length > 0) {
+						$('#compare').val(current_terms+','+term);
+					} else {
+						$('#compare').val(term);
+					}
+				
+				
+				}
+			
+				function compare() {
+					var terms = $('#compare').val();
+					terms = $.trim(terms);
+					document.location = '<?=site_url()?>/trends/last24hours/'+encodeURIComponent(terms)
+				}
+			
+			
+			</script>
 
+			<div id="comparisons" style="display:none; text-align:center">
+				<form id="compare-form">
+					<label for="compare">Terms</label> <input type="text" name="compare" value="" id="compare" />
+					<input type="button" name="submit" value="Compare" id="submit" />
+				</form>
+			
+				<div id="compare-notes">Separate terms with commas</div>
+			</div>
+
+
+		
+		
+			<table id="full-list" class="tablesorter">
+				<thead>
+				<tr>
+					<th>Term</th>
+					<th>%</th>
+					<th>Actions</th>
+				</tr>
+				</thead>
+				<tbody>
+				<?foreach($source_counts as $key=>$val):?>
+				<tr>
+					<td>
+						<a title="Search for post containing &quot;<?=$key?>&quot;" href="http://search.twitter.com/search?q=<?=urlencode($key)?>" target="_blank"><?=$key?></a>
+					</td>
+					<td><?=number_format(($val/$sources_total)*100, 3)?>%</td>
+					<td>
+						[<a title="Examine popularity of &quot;<?=$key?>&quot; over the last 12 hours" href="<?=site_url()?>/trends/last12hours/<?=$key?>">Chart last 12hrs</a>]
+						[<a title="Examine popularity of &quot;<?=$key?>&quot; over the last 24 hours" href="<?=site_url()?>/trends/last24hours/<?=$key?>">Chart last 24hrs</a>]
+						[<a title="Compare term popularity" id="--term-<?=$key?>" class="clickable compare-link">Compare…</a>]
+					</td>
+				</tr>
+				<?endforeach;?>
+				</tbody>
+			</table>
+		
+		
+		<?php endif ?>
+		
+		
 	</div>
 
 	<?php $this->load->view('emb_footer')?>

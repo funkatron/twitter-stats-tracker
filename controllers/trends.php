@@ -1,12 +1,12 @@
 <?php
-error_reporting('on');
+ini_set('display_errors','on');
 require_once('/var/www/shared/gChart2.php');
 
 class Trends extends Controller {
 
 	const JSON_FILE_PATH = '/var/www/funkatron.com/htdocs/twitter-source-stats.json';
 
-	const PAGE_TITLE     = 'Twitter Trend Stats';
+	const PAGE_TITLE     = 'Twitter Trends';
 
 	public function Trends() {
 		parent::Controller();	
@@ -30,7 +30,7 @@ class Trends extends Controller {
 		$view_data['period_interval'] = 'hour';
 		$view_data['period_start']  = '-1 hour';
 		$view_data['period_duration'] = 1;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Last Hour";
 		
 		
 		$this->load->view('trends', $view_data);
@@ -55,7 +55,7 @@ class Trends extends Controller {
 		$view_data['period_interval'] = 'hour';
 		$view_data['period_start']  = '-12 hours';
 		$view_data['period_duration'] = 12;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Last 12 Hours";
 		
 		
 		$this->load->view('trends', $view_data);
@@ -80,7 +80,7 @@ class Trends extends Controller {
 		$view_data['period_interval'] = 'hour';
 		$view_data['period_start']  = '-'.$duration.' hours';
 		$view_data['period_duration'] = $duration;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Last 24 Hours";
 		
 		
 		$this->load->view('trends', $view_data);
@@ -136,7 +136,7 @@ class Trends extends Controller {
 		// $view_data['last_updated']  = filemtime(self::JSON_FILE_PATH);
 		$view_data['period_start']  = 'today';
 		$view_data['period_duration'] = 1;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Today";
 		
 		
 		$this->load->view('trends', $view_data);
@@ -148,12 +148,10 @@ class Trends extends Controller {
 		$this->load->model('mtrends');
 		$rows = $this->mtrends->getStatsForPeriod('yesterday',1);
 		
-		// echo "<pre>"; echo print_r($rows, true); echo "</pre>";
-		
 		$view_data = $this->_prepDataForView($rows);
 		$view_data['period_start']  = 'yesterday';
 		$view_data['period_duration'] = 1;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Yesterday";
 		
 		$this->load->view('trends', $view_data);
 	}
@@ -165,7 +163,7 @@ class Trends extends Controller {
 		$view_data = $this->_prepDataForView($rows);
 		$view_data['period_start']  = '-7 days';
 		$view_data['period_duration'] = 7;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Last Seven Days";
 		
 		$this->load->view('trends', $view_data);
 		
@@ -178,7 +176,7 @@ class Trends extends Controller {
 		$view_data = $this->_prepDataForView($rows);
 		$view_data['period_start']  = '-1 month';
 		$view_data['period_duration'] = 30;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['page_title']  = self::PAGE_TITLE . ": Last Month";
 		
 		$this->load->view('trends', $view_data);
 		
@@ -189,9 +187,24 @@ class Trends extends Controller {
 	
 	private function _showTermStats($rows, $period_start, $num_hours)
 	{
+		$offset_secs = (int)date('Z');
+		
 		// build arrays
 		$xlabels = array_keys($rows[0]->points);
+		
+		// echo "<pre>"; echo print_r($xlabels, true); echo "</pre>";
+		
 		array_shift($xlabels);
+		
+		
+		
+		/*
+			Adjust for GMT so labels show local server time
+		*/
+		foreach($xlabels as &$val) {
+			$val = $val+$offset_secs;
+		}
+		
 		$maxval = 0;
 		foreach($rows as $row) {
 			
@@ -201,7 +214,7 @@ class Trends extends Controller {
 			
 			// echo "<pre>"; echo print_r($maxval, true); echo "</pre>";
 			foreach($row->points as &$val) {
-				$val = round(($val/$maxval)*100,2);
+				$val = round(($val/$maxval)*100,0);
 			}
 			
 			ksort($row->points);
@@ -219,8 +232,8 @@ class Trends extends Controller {
 		/*
 			make view_data array
 		*/
-		$view_data['source_counts'] = $counts;
-		$view_data['sources_total'] = $total;
+		// $view_data['source_counts'] = $counts;
+		// $view_data['sources_total'] = $total;
 		$view_data['chart_url']     = $url;
 
 		
@@ -228,7 +241,10 @@ class Trends extends Controller {
 		$view_data['period_interval'] = 'hour';
 		$view_data['period_start']    = $period_start;
 		$view_data['period_duration'] = $num_hours;
-		$view_data['page_title']  = self::PAGE_TITLE;
+		$view_data['terms']           = $terms;
+		$terms_str = implode(', ', $terms);
+		$view_data['page_title']  = self::PAGE_TITLE . " for " . urldecode($terms_str);
+		
 		
 		
 		$this->load->view('trends', $view_data);
@@ -321,29 +337,71 @@ class Trends extends Controller {
 	
 	
 	
-	private function _makeGchartBarUrl(array $labels, array $values, array $colors)
+	private function _makeGchartBarUrl(array $xlabels, array $yvals, array $colors, array $terms)
 	{
+		$max_x = 100;
+		$points = count($xlabels);
+		// echo "<pre>"; echo print_r($xlabels, true); echo "</pre>";
+		// echo "<pre>"; echo print_r($yvals, true); echo "</pre>";
+		// echo "<pre>"; echo print_r($terms, true); echo "</pre>";
+
+		$interval = round($max_x/($points-1),0);
+		
+		$xaxis = array();
+		for ($x=0; $x<$points; $x++) {
+			if ($interval*$x > $max_x) {
+				$xaxis[] = $max_x;
+			} else {
+				$xaxis[] = $interval*$x;
+			}
+
+		}
+		$xaxis = implode(',',$xaxis);
+		
+		
 		$url  = "http://chart.apis.google.com/chart?";
 
 		// type
-		$url .= "&cht=bvs";
+		$url .= "&cht=bvg";
 
 		// size
 		$url .= "&chs=700x300";
-		$url .= "&chbh=10";
+		$url .= "&chbh=3,0,12";
 
 		// data
-		$url .= "&chd=t:".implode(',',$values);
-		// $url .= "&chds=1,100";
+		
+		foreach($yvals as $yval) {
+			$x_y = array();
+			// $x_y['x']=$xaxis;
+			$x_y['y']=$yval;
+			$data_sets[] = implode("|", $x_y);
+		}
+		$data_string = implode("|", $data_sets);
+		$url .= "&chd=t:$data_string";
+		
+		// $url .= "&chd=t:".implode("|",$yvals);
+
+
+		// x-axis labels
+		$url .= "&chxt=x";
+		foreach($xlabels as $unixtime) {
+			$xlbls[] = urlencode(date('ga', $unixtime));
+		}
+		$url .= "&chxl=0:|".implode('|', $xlbls);
 
 		// colors
-		$url .= "&chco=".implode('|', $colors);
+		$url .= "&chco=".implode(',', $colors);
 
 		// legend
-		$url .= "&chdl=".implode('|', $labels);
-		// $url .= "&chdlp=b";
+		$url .= "&chdl=".implode('|', $terms);
+		$url .= "&chdlp=b";
 		
+		// gridlines
+		echo "<pre>"; echo print_r($interval, true); echo "</pre>";
+		$url .= "&chg=".$interval.",10,1,3";
+		$url .= "&chf=c,ls,0,FFFFCC,".($interval/100).",FFFFFF,".($interval/100);
 		
+		// echo "<textarea style='width:95%;height:100px'>$url</textarea>";
 		
 		return $url;
 	}
@@ -354,6 +412,13 @@ class Trends extends Controller {
 		
 		$max_x = 100;
 		$points = count($xlabels);
+		
+		// foreach($yvals as &$yvalstr) {
+		// 	$yvals = explode(',', $yvalstr);
+		// 	$yvalstr = $this->array_to_extended_encoding($yvals);
+		// }
+		
+		
 		// echo "<pre>"; echo print_r($xlabels, true); echo "</pre>";
 		// echo "<pre>"; echo print_r($yvals, true); echo "</pre>";
 		// echo "<pre>"; echo print_r($terms, true); echo "</pre>";
@@ -416,6 +481,33 @@ class Trends extends Controller {
 		
 		return $url;
 	}	
+	
+	
+	
+	private function _gchartEncodeExtended($string) {
+		$characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.';
+		$first = floor($value / 64);
+        $second = $value % 64;
+        $encoding .= $characters[$first] . $characters[$second];
+		return $encoding;
+	}
+	
+	
+	private function array_to_extended_encoding($array)
+	{
+	    $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.';
+
+	    $encoding = '';
+	    foreach ($array as $value) {
+	        $first = floor($value / 64);
+	        $second = $value % 64;
+	        $encoding .= $characters[$first] . $characters[$second];
+			// echo "<pre>"; echo print_r($value, true); echo "</pre>";
+			// echo "<pre>"; echo print_r($encoding, true); echo "</pre>";
+	    }
+
+	    return $encoding;
+	}
 	
 	
 	

@@ -21,7 +21,16 @@ class MTrends extends Model {
 	 */
 	public function getStatsForPeriod($date_start, $num_days, $nocache=null)
 	{
+		$offset_secs = (int)date('Z');
+		
+		// if ($term) { $nocache='nocache'; }
+		
+		// echo "<pre>"; echo print_r($term, true); echo "</pre>";
 		$date_start = strtotime($date_start);
+		// echo "<pre>"; echo print_r($date_start, true); echo "</pre>";
+		// $date_start = $date_start + $offset_secs; // trends data is stored in GMT, so adjust for offset
+		// echo "<pre>"; echo print_r($date_start, true); echo "</pre>";
+		
 		/*
 			create start key
 		*/
@@ -30,7 +39,11 @@ class MTrends extends Model {
 		$d = date('j', $date_start);
 		$startkey = "[$Y,$m,$d]";
 		
+		// echo "<pre>"; echo print_r(date("Y-m-d H:i:s", $date_start), true); echo "</pre>";
+		
 		$date_end = $date_start+($num_days*24*60*60);
+		
+		// echo "<pre>"; echo print_r(date("Y-m-d H:i:s", $date_end), true); echo "</pre>";
 		/*
 			create end key
 		*/
@@ -40,6 +53,9 @@ class MTrends extends Model {
 		$endkey = "[$Y,$m,$d]";
 		
 		$hashkey = 'TRENDS-'.$startkey.'_to_'.$endkey;
+		
+		
+		// echo "<pre>"; echo print_r($hashkey, true); echo "</pre>";
 		
 		
 		/*
@@ -118,10 +134,16 @@ class MTrends extends Model {
 	public function getStatsForHourPeriod($datetime_start, $num_hours, $term=null, $nocache=null)
 	{
 		
+		$offset_secs = (int)date('Z');
+		
 		if ($term) { $nocache='nocache'; }
 		
 		// echo "<pre>"; echo print_r($term, true); echo "</pre>";
 		$date_start = strtotime($datetime_start);
+		// echo "<pre>"; echo print_r($date_start, true); echo "</pre>";
+		// $date_start = $date_start + $offset_secs; // trends data is stored in GMT, so adjust for offset
+		// echo "<pre>"; echo print_r($date_start, true); echo "</pre>";
+		
 		/*
 			create start key
 		*/
@@ -208,8 +230,9 @@ class MTrends extends Model {
 		/*
 			Cache this
 		*/
-		file_put_contents(self::CACHE_PATH."$hashkey", json_encode($statObjs));
-		
+		if (!$nocache) {
+			file_put_contents(self::CACHE_PATH."$hashkey", json_encode($statObjs));
+		}
 		
 
 		
@@ -243,8 +266,10 @@ class MTrends extends Model {
 		
 		$terms = explode(',',$term);
 		
-		// echo "<pre>"; echo print_r($term, true); echo "</pre>";
+		$offset_secs = (int)date('Z');
 		$date_start = strtotime($datetime_start);
+		$date_start = $date_start - $offset_secs; // trends data is stored in GMT, so adjust for offset
+
 		/*
 			create start key
 		*/
@@ -273,7 +298,7 @@ class MTrends extends Model {
 		*/
 		$samplepoints = array();
 		
-		for ($x=$unixstart; $x<$unixend; $x += (60*60)) {
+		for ($x=$unixstart; $x<=$unixend; $x += (60*60)) {
 			$samplepoints[$x] = 0;
 		}
 		// echo "<pre>"; echo print_r($samplepoints, true); echo "</pre>";
@@ -322,7 +347,11 @@ class MTrends extends Model {
 			foreach ($result->rows as $row) {
 				// echo "<pre>"; var_dump($row); echo "</pre>";
 				if (strtolower($row->key[4]) == strtolower($term)) {
-					$unixhour = strtotime($row->key[0]."-".($row->key[1]+1)."-".$row->key[2].' '.($row->key[3]+1).":00:00");
+					
+					// $strtime = $row->key[0]."-".($row->key[1]+1)."-".$row->key[2].' '.($row->key[3]+1).":00:00";
+					// echo "<pre>"; echo print_r($strtime, true); echo "</pre>";
+					// $unixhour = strtotime($strtime);
+					$unixhour = mktime($row->key[3]+1, 0, 0, $row->key[1]+1, $row->key[2], $row->key[0]);
 					// echo date("Y-m-d H:i:s", $unixhour)."<br>";
 					$stats->points[$unixhour] = $row->value;
 				}
@@ -337,8 +366,9 @@ class MTrends extends Model {
 		/*
 			Cache this
 		*/
-		file_put_contents(self::CACHE_PATH."$hashkey", json_encode($statObjs));
-		
+		if (!$nocache) {
+			file_put_contents(self::CACHE_PATH."$hashkey", json_encode($statObjs));
+		}
 		
 
 		

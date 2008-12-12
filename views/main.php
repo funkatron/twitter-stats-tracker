@@ -24,6 +24,20 @@
 	
 		<div id="chart"><img src="<?php echo $chart_url?>" /></div>
 
+		<div id="adsense">
+			<script type="text/javascript"><!--
+			google_ad_client = "pub-7378172068209306";
+			/* Twitter Stats 468x60 */
+			google_ad_slot = "7756658761";
+			google_ad_width = 468;
+			google_ad_height = 60;
+			//-->
+			</script>
+			<script type="text/javascript"
+			src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+			</script>
+		</div>
+
 		<div id="note">
 		This data is derived from 20-message slices taken every minute from the Twitter public timeline. It currently reports the overall usage since the data collection began (2008-07-31), as well as a few common time periods.<p />
 

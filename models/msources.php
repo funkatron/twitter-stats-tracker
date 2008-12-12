@@ -62,7 +62,7 @@ class MSources extends Model {
 		/*
 			cache has expired or DNE, so fall through and query
 		*/
-		$url = "http://127.0.0.1:5984/publictweets/_view/source/byday?group=true&startkey=$startkey&endkey=$endkey";
+		$url = "http://127.0.0.1:5984/publictweets_sources/_view/sources/byday?group=true&startkey=$startkey&endkey=$endkey";
 		// echo "<pre>"; echo print_r($url, true); echo "</pre>";
 		$json_counts = file_get_contents($url);
 		// echo "<pre>"; echo print_r($json_counts, true); echo "</pre>";
