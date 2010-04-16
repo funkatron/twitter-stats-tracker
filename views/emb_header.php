@@ -7,214 +7,129 @@
 
 	<title><?=$page_title?></title>
 
-
-	<style type="text/css" media="screen">
-		@import "/assets/jquery.tablesorter/themes/blue/style.css";
-	
-		BODY {
-			font-family: Palatino, 'Palatino Linotype', Georgia, Times, 'Times New Roman', "MS Trebuchet", serif;
-			padding:0;
-			margin:0;
-		}
-		
-		
-		A:link, .clickable {
-			color: #00C;
-			text-decoration: underline;
-			cursor:pointer;
-		}
-		
-		#container {
-			margin-left:auto;
-			margin-right:auto;
-			width:700px;
-		}
-
-		h1, h2, #nav {
-			margin-left:auto;
-			margin-right:auto;
-			width:600px;
-		}
-		
-		h2{
-			font-size:13pt;
-		}
-		
-		#nav ul {
-			padding-left:0px;
-			list-style: none;
-			white-space: nowrap;
-		}
-		
-			#nav ul li {
-				display:inline;
-				margin: 0;
-				padding:0;
-				list-style:none;
-			}
-		
-				#nav ul li a {
-					font-size:10pt;
-					-webkit-border-radius:10px;
-					-moz-border-radius:   10px;
-					border-radius:        10px;
-					background-color:#DDDDCC;
-					padding:3pt 6pt;
-					margin-right:5pt;
-					white-space: nowrap;
-				}
-				#nav ul li a:link, #nav ul li a:visited, #nav ul li a:active {
-					text-decoration:none;
-					color:#333333;
-				}
-		
-		#full-list {
-			margin-left:auto;
-			margin-right:auto;
-			width:600px;
-		}
-		#chart {
-			text-align:center;
-		}
-		#note {
-			font-size:9pt;
-			padding:10px;
-			margin:10px;
-			background-color:#FFFFCC;
-			border-top:3px double #999;
-			border-bottom:3px double #999;
-			
-			color:#666;
-			margin-left:auto;
-			margin-right:auto;
-			width:500px;
-			
-			line-height:1.5em;
-		}
-
-		#adsense {
-			font-size:9pt;
-			padding:10px;
-			margin:10px;
-			background-color:#CCCCFF;
-			border-top:3px double #333333;
-			border-bottom:3px double #333333;
-			
-			color:#000000;
-			margin-left:auto;
-			margin-right:auto;
-			width:500px;
-			
-			line-height:1.5em;
-		}
-		
-		#ad {
-			font-size:9pt;
-			padding:10px;
-			margin:10px;
-			background-color:#CCCCFF;
-			border-top:3px double #333333;
-			border-bottom:3px double #333333;
-			
-			color:#000000;
-			margin-left:auto;
-			margin-right:auto;
-			width:500px;
-			
-			line-height:1.5em;
-		}
-		
-		#terms-links {
-			margin-left:auto;
-			margin-right:auto;
-			width:500px;
-		}
-		
-		#note p+p {
-/*			padding:5px 0 0 0 ;*/
-			margin: .5em 0 0 0;
-		}
-		
-		#comparisons {
-			line-height:1.5em;
-		}
-		label { margin-right: .2em;}
-		#compare {
-			width:300px;
-		}
-		#compare-notes {
-			font-style: italic;
-			font-size:10pt;
-			color:#666;
-		}
-
-		
-	</style>
-	
-	<style type="text/css" media="screen">
-
-
-		#funkatron-bar {
-			font-family: Palatino, Palatino MS, Georgia, Times, Serif;
-			border-top:2px solid #000;
-			border-bottom:2px solid #000;
-/*			background: #9C9B7A;*/
-			background: #202020;
-			z-index: 50;
-/*			opacity: 0.4;*/
-			color: #999999;
-			padding:5px 5px 3px;
-
-		}
-			#funkatron-bar-container {
-				margin-left:auto;
-				margin-right:auto;
-				width:900px;
-				text-align:center;
-/*				border:1px solid green;*/
-			}
-
-				#blogtitle {
-					color: #FFFFFF;
-					text-transform: uppercase;
-				}
-
-				#blogtitle a:link, #blogtitle a:active, #blogtitle a:visited {color:#AAAAAA; text-decoration:none;}
-
-				#funkatron-bar ul {
-					display:inline;
-					list-style:none;
-					padding:0;
-					margin:0 0 0 175px;
-				}
-					#funkatron-bar li {
-						display:inline;
-						padding:0;
-						margin:0 0 0 1em;
-					}
-
-						#funkatron-bar li a, #funkatron-bar li a:visited {
-							text-transform: uppercase; 
-							color: #AAAAAA;
-							text-decoration:none;
-						}
-						#funkatron-bar li a:hover, #blogtitle a:hover {
-							background-color:transparent !important;
-				/*			border-bottom: 1px solid #FFFFFF !important;*/
-							color: #FFFFFF !important;
-						}
-						#rssfeed img {vertical-align:-10%;}
-
-	</style>
+	<link rel="stylesheet" href="/assets/tss-css/tss.css" type="text/css" charset="utf-8">
 
 	<script src="http://www.google.com/jsapi"></script>
 	<script type="text/javascript" charset="utf-8">
 		google.load("jquery", "1");
 	</script>
-	<script type="text/javascript" charset="utf-8" src="/assets/jquery.tablesorter/jquery.tablesorter.min.js"></script>
+	
+	<script language="JavaScript" src="/assets/jquery.rule-1.0.1.1-min.js"></script>
+	<script language="JavaScript" src="/assets/jquery.event.drag.custom.js"></script>
+	<script language="JavaScript" src="/assets/slick.grid.js"></script>
+	<script language="JavaScript" src="/assets/slick.model.js"></script>
+
+	<script type="text/javascript" charset="utf-8">
+	var grid;
+	var dataView;
+	var sortcol = "source";
+	var sortdir = 1;
+	var searchString = "";
+	var data = [], rows = [];
+	
+	<?php
+		function cmp($a, $b) {
+			if ($a->count == $b->count) {
+				return 0;
+			}
+			return ($a->count > $b->count) ? -1 : 1;
+		}
+		usort($data->results, 'cmp')
+	?>
+	<?$x=1;?>
+	<?foreach($data->results as $result):?>
+	data.push({ "id":"<?='id_'.$x;?>", "rank":"<?=$x++;?>", "link":"<?=$result->link?>", "source":"<?=$result->source?>", "percent":"<?=number_format(($result->count/$data->total)*100, 3)?>"});
+	<?endforeach;?>
+	
+
+	function myFilter(item) {
+		if (searchString != "" && item["source"].indexOf(searchString) == -1) {
+			return false;
+		}
+		return true;
+	}
+
+	function comparer(a,b) {
+		var x = a[sortcol], y = b[sortcol];
+		return (x == y ? 0 : (x > y ? 1 : -1));
+	}
+	
+	function numeric_comparer(a,b) {
+		var x = a[sortcol]*1, y = b[sortcol]*1;
+		return (x == y ? 0 : (x > y ? 1 : -1));
+	}
+	
+
+	var addLinkFormatter = function(row, cell, value, columnDef, dataContext) {
+		if (dataContext.link.indexOf('http') !== -1) {
+			return "<a href='"+dataContext.link+"' target='_blank'>"+value+"</a>";
+		}
+		return value;
+	};
+	
+
+	var columns = [
+		{id:"rank", name:"Rank", field:"rank",width:70,sortable:true},
+		{id:"app", name:"App", field:"source",width:400, formatter:addLinkFormatter,sortable:true},
+		{id:"percent", name:"%", field:"percent",width:70,sortable:true}
+	];
+
+	var options = {
+		'enableCellNavigation' : false,
+		'enableColumnReorder'  : false,
+		'enableCellNavigation' : true,
+		'forceFitColumns'      : true
+	};	
+	
+	</script>
+	
+	
 	<script type="text/javascript" charset="utf-8">
 		$().ready( function() {
-			$('#full-list').tablesorter({sortList: [[1,1], [0,0]]});
+
+						
+			dataView = new Slick.Data.DataView();
+			grid = new Slick.Grid($("#myGrid"), dataView.rows, columns, options);
+
+
+			grid.onSort = function(sortCol, sortAsc) {
+				sortdir = sortAsc ? 1 : -1;
+				sortcol = sortCol.field;
+				// using native sort with comparer
+				// preferred method but can be very slow in IE with huge datasets
+				if (sortCol.field == 'source') {
+					dataView.sort(comparer,sortAsc);
+				} else {
+					dataView.sort(numeric_comparer,sortAsc);
+				}
+
+			};
+
+			// wire up model events to drive the grid
+			dataView.onRowCountChanged.subscribe(function(args) {
+				grid.updateRowCount();
+			});
+
+			dataView.onRowsChanged.subscribe(function(rows) {
+				grid.removeRows(rows);
+				grid.render();
+
+			});
+
+			$('#search_app_name').keyup(function(e) {
+				// clear on Esc
+				if (e.which == 27)
+					this.value = "";
+
+				searchString = this.value;
+				dataView.refresh();
+			});
+			
+			// initialize the model after all the events have been hooked up
+			dataView.beginUpdate();
+			dataView.setItems(data);
+			dataView.setFilter(myFilter);
+			dataView.endUpdate();
 		});
 	</script>
 	

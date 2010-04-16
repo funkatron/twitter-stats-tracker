@@ -20,6 +20,8 @@ foreach ($pubtweets->docs as &$doc) {
 
 $newjson = json_encode($pubtweets);
 
+echo "<pre>"; echo print_r($newjson, true); echo "</pre>";
+
 $cdb_url = 'http://127.0.0.1:5984/publictweets_sources/_bulk_docs';
 
 $http = new HttpRequest($cdb_url, HttpRequest::METH_POST);
@@ -40,6 +42,7 @@ foreach($counts->rows as &$row) {
 	$row->key = strip_tags(stripslashes($row->key));
 }
 
+echo "<pre>"; echo print_r($counts, true); echo "</pre>";
 
 $json_counts = json_encode($counts);
 

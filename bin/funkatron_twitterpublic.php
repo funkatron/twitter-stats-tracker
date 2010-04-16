@@ -16,7 +16,7 @@ $pubtweets->docs = json_decode($json);
 $newjson = json_encode($pubtweets);
 // $json = json_encode(json_decode($json));
 
-// echo "<pre>"; echo print_r($json, true); echo "</pre>";
+echo "<pre>"; echo print_r($json, true); echo "</pre>";
 
 $cdb_url = 'http://127.0.0.1:5984/publictweets/_bulk_docs';
 

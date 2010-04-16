@@ -43,6 +43,8 @@
 $route['default_controller'] = "main";
 $route['scaffolding_trigger'] = "";
 
+$route['lasthour'] = 'main/lasthour';
+
 
 /* End of file routes.php */
 /* Location: ./system/application/config/routes.php */
