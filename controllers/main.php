@@ -4,9 +4,15 @@ require_once('/var/www/shared/gChart2.php');
 
 class Main extends Controller {
 
-	const JSON_FILE_PATH = '/var/www/funkatron.com/htdocs/twitter-source-stats.json';
+	const JSON_FILE_PATH_LASTHOUR    = 'http://funkatrondigital.com/tss/counts_lasthour.json';
+	const JSON_FILE_PATH_LASTDAY     = 'http://funkatrondigital.com/tss/counts_lastday.json';
+	const JSON_FILE_PATH_LASTWEEK    = 'http://funkatrondigital.com/tss/counts_lastweek.json';
+	const JSON_FILE_PATH_LAST30DAYS  = 'http://funkatrondigital.com/tss/counts_last30days.json';
+	const JSON_FILE_PATH_LAST90DAYS  = 'http://funkatrondigital.com/tss/counts_last90days.json';
+	const JSON_FILE_PATH_LAST180DAYS = 'http://funkatrondigital.com/tss/counts_last180days.json';
+	const JSON_FILE_PATH_ALLTIME     = 'http://funkatrondigital.com/tss/counts_alltime.json';
 
-	const PAGE_TITLE     = 'Twitter Sources';
+	const PAGE_TITLE     = 'Twitter Source Stats';
 
 	const HTTP_STATUS_OK = '200 OK';
 	const HTTP_STATUS_BAD_REQUEST = '400 Bad Request';
@@ -16,6 +22,7 @@ class Main extends Controller {
 
 	public function Main() {
 		parent::Controller();	
+		$this->output->cache(5);
 	}
 	
 	/**
@@ -25,108 +32,57 @@ class Main extends Controller {
 	 * @return void
 	 * @author Ed Finkler	
 	 */
-	public function index($format="html") {
-		$data = json_decode(file_get_contents(self::JSON_FILE_PATH));
-		
-
-		
-		$rows = $data->rows;
-		unset($data);
-		
-		$last_mod = filemtime(self::JSON_FILE_PATH);
-		
-		$view_data = $this->_prepDataForView($rows);
-		$view_data['last_updated']  = $last_mod;
-		if (strtolower($format) === "json") {
-			
-			$this->_sendAsJSON($view_data);
-			return;
-		}
-
-		$view_data['page_title']  = self::PAGE_TITLE;
-		
-		$this->load->view('main', $view_data);
+	public function index() {
+		$this->lasthour();
 	}
-
-
-	public function today($format="html")
+	
+	
+	protected function _showData($json_path, $title)
 	{
-		$this->load->model('msources');
-		$rows = $this->msources->getStatsForPeriod('today',1);
+		$data = json_decode(file_get_contents($json_path));
 		
-		$view_data = $this->_prepDataForView($rows);
-		$view_data['last_updated']  = filemtime(self::JSON_FILE_PATH);
-		if (strtolower($format) === "json") {
-			
-			$this->_sendAsJSON($view_data);
-			return;
-		}
-		$view_data['period_start']  = 'today';
-		$view_data['period_duration'] = 1;
-		$view_data['page_title']  = self::PAGE_TITLE;
 
 		
+		$view_data['gchart_url'] = $this->_getGchartURL($data);
+		$view_data['data'] = $data;
+		$view_data['page_title']  = self::PAGE_TITLE.": ".$title;
+		
 		$this->load->view('main', $view_data);
-	}	
+	}
 	
-	
-	public function yesterday($format="html")
+	public function lasthour()
 	{
-		$this->load->model('msources');
-		$rows = $this->msources->getStatsForPeriod('yesterday',1);
-		
-		$view_data = $this->_prepDataForView($rows);
-		$view_data['last_updated']  = filemtime(self::JSON_FILE_PATH);
-		if (strtolower($format) === "json") {
-			
-			$this->_sendAsJSON($view_data);
-			return;
-		}
-		$view_data['period_start']  = 'yesterday';
-		$view_data['period_duration'] = 1;
-		$view_data['page_title']  = self::PAGE_TITLE;
-		
-		$this->load->view('main', $view_data);
+		$this->_showData(self::JSON_FILE_PATH_LASTHOUR, 'Last Hour');
 	}
-
-	public function lastsevendays($format="html") {
-		$this->load->model('msources');
-		$rows = $this->msources->getStatsForPeriod('-1 week',7);
-		
-		$view_data = $this->_prepDataForView($rows);
-		$view_data['last_updated']  = filemtime(self::JSON_FILE_PATH);
-		if (strtolower($format) === "json") {
-			
-			$this->_sendAsJSON($view_data);
-			return;
-		}
-		$view_data['period_start']  = '-1 week';
-		$view_data['period_duration'] = 7;
-		$view_data['page_title']  = self::PAGE_TITLE;
-		
-		$this->load->view('main', $view_data);
+	public function lastday()
+	{
+		$this->_showData(self::JSON_FILE_PATH_LASTDAY, 'Last Day');
+	}
+	public function lastweek()
+	{
+		$this->_showData(self::JSON_FILE_PATH_LASTWEEK, 'Last Week');
+	}
+	public function last30days()
+	{
+		$this->_showData(self::JSON_FILE_PATH_LAST30DAYS, 'Last 30 Days');
+	}
+	public function last90days()
+	{
+		$this->_showData(self::JSON_FILE_PATH_LAST90DAYS, 'Last 90 Days');
+	}
+	public function last180days()
+	{
+		$this->_showData(self::JSON_FILE_PATH_LAST180DAYS, 'Last 180 Days');
+	}
+	public function all()
+	{
+		$this->_showData(self::JSON_FILE_PATH_ALLTIME, 'All');
+	}
+	public function sources()
+	{
 		
 	}
 
-	public function lastmonth($format="html") {
-		$this->load->model('msources');
-		$rows = $this->msources->getStatsForPeriod('-1 month',30);
-		
-		$view_data = $this->_prepDataForView($rows);
-		$view_data['last_updated']  = filemtime(self::JSON_FILE_PATH);
-		if (strtolower($format) === "json") {
-			
-			$this->_sendAsJSON($view_data);
-			return;
-		}
-		$view_data['period_start']  = '-1 month';
-		$view_data['period_duration'] = 30;
-		$view_data['page_title']  = self::PAGE_TITLE;
-		
-		$this->load->view('main', $view_data);
-		
-	}
-	
 	
 	
 	/**
@@ -150,77 +106,65 @@ class Main extends Controller {
 	
 
 	
-	private function _prepDataForView(array $rows)
+	private function _getGchartURL($data)
 	{
-		$total  = 0;
-		$subtotal = 0;
+		$total  = $data->total;
+		$others_total = 0;
 		$values = Array();
 		$pers   = Array();
 		$labels = Array();
 
 
-		// calc total
-		foreach($rows as $row) {
-			$total += $row->value;
-		}
-
-		// normalize names (URLs can change, names should not)
-		foreach ($rows as $row) {
-			$normkey = strtolower($row->key);
-			if (!isset($counts[$normkey])) {
-				$counts[$normkey] = 0;
-			}
-
-			$counts[$normkey] += $row->value;
-		}
+		// // normalize names (URLs can change, names should not)
+		// foreach ($rows as $row) {
+		// 	$normkey = strtolower($row->key);
+		// 	if (!isset($counts[$normkey])) {
+		// 		$counts[$normkey] = 0;
+		// 	}
+		// 
+		// 	$counts[$normkey] += $row->value;
+		// }
 
 		// build data
-		foreach($counts as $key=>$val) {
-			$per = round(($val/$total)*100);
+		foreach($data->results as $result) {
+			$per = round(($result->count/$total)*100);
 			if ($per >= 1) {
-				$values[] = $val;
+				$values[] = $result->count;
 				$pers[] = $per;
-				$labels[] = $key;
+				$labels[] = $result->source;
 				$colors[] = $this->_random_color();
-				$subtotal += $val;
+			} else {
+				$others_total += $result->count;
 			}
+			
 		}
 
 		// calculate size of "others"
-		$others_val = $total - $subtotal;
-		$values[] = $others_val;
-		$pers[]   = round(($others_val/$total)*100);
+		$values[] = $others_total;
+		$pers[]   = round(($others_total/$total)*100);
 		$labels[] = "Other";
 		$colors[] = $this->_random_color();
 		
+		
 		$url = $this->_makeGchartUrl($labels, $pers, $colors);
 		
-		/*
-			make view_data array
-		*/
-		$view_data['source_counts'] = $counts;
-		$view_data['sources_total'] = $total;
-		$view_data['chart_url']     = $url;
-		$view_data['source_percentages'] = $this->_calcPercentages($view_data);
-
+		return $url;
 		
-		return $view_data;
+		// /*
+		// 	make view_data array
+		// */
+		// $view_data['source_counts'] = $counts;
+		// $view_data['sources_total'] = $total;
+		// $view_data['chart_url']     = $url;
+		// $view_data['source_percentages'] = $this->_calcPercentages($view_data);
+		// 
+		// 
+		// return $view_data;
+		
+		
+		
 	}
 	
-
-	private function _calcPercentages($view_data) {
-		
-		// echo "<pre>"; echo print_r($view_data, true); echo "</pre>";
-		
-		$view_data['source_percentages'] = array();
-		
-		foreach ($view_data['source_counts'] as $key=>$val) {
-			$per = number_format(($val/$view_data['sources_total'])*100, 3);
-			$view_data['source_percentages'][$key] = $per;
-		}
-		
-		return $view_data['source_percentages'];
-	}
 
 	
 	private function _makeGchartUrl(array $labels, array $values, array $colors)
@@ -241,6 +185,9 @@ class Main extends Controller {
 		$url .= "&chco=".implode(',', $colors);
 
 		// labels
+		foreach($labels as &$label) {
+			$label = strip_tags(stripslashes($label));
+		}
 		$url .= "&chl=".implode('|', $labels);
 		
 		return $url;
@@ -252,12 +199,101 @@ class Main extends Controller {
 	    mt_srand((double)microtime()*1000000);
 	    $c = '';
 	    while(strlen($c)<6){
-	        $c .= sprintf("%02X", mt_rand(0, 255));
+	        $c .= sprintf("%02X", mt_rand(64, 255));
 	    }
 	    return $c;
 	}
 	
 }
+
+
+/**
+ * Debug Function
+ * 
+ * This function can improve your debugging actions by using the Firefox extension "Firebug"
+ * 
+ * Copyright (C) 2006 - Mathias Bank (http://forenblogger.de)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ * or go to http://www.gnu.org/licenses/gpl.html
+ */
+
+if (!defined("DEBUG_TYPE_LOG")) define("DEBUG_TYPE_LOG",1);
+if (!defined("DEBUG_TYPE_INFO")) define("DEBUG_TYPE_INFO",2);
+if (!defined("DEBUG_TYPE_WARN")) define("DEBUG_TYPE_WARN",3);
+if (!defined("DEBUG_TYPE_ERR")) define("DEBUG_TYPE_ERR",4);
+
+if (!defined("NL")) define("NL","\r\n");
+
+/**
+ * Debug function
+ * Prints debug messages to firebug
+ * 
+ * It can be used like:
+ * <code>
+ *   debug("simple message");
+ *   debug("simple warning","",DEBUG_TYPE_WARN);
+ *   debug("varX",$x);
+ *   debug("object y", $y);
+ * </code>
+ * @param string text message (names or simple Messages)
+ * @param [string] variable which should be printed
+ * @param [int] message type: DEBUG_TYPE_LOG | DEBUG_TYPE_INFO | DEBUG_TYPE_WARN | DEBUG_TYPE_ERR
+ */
+function fbdebug($name, $var="", $messageType=DEBUG_TYPE_LOG) {
+
+	echo '<script type="text/javascript">'.NL;
+			
+	if ($messageType==DEBUG_TYPE_LOG)
+		echo 'console.log("'.$name.'");'.NL;
+	elseif ($messageType==DEBUG_TYPE_INFO)
+		echo 'console.info("'.$name.'");'.NL;
+	elseif ($messageType==DEBUG_TYPE_WARN)
+		echo 'console.warn("'.$name.'");'.NL;
+	elseif ($messageType==DEBUG_TYPE_ERR)
+		echo 'console.error("'.$name.'");'.NL;
+	
+	if (!empty($var)) {
+		if (is_object($var) || is_array($var)) {
+			$object = json_encode($var);
+			echo 'var object'.preg_replace('~[^A-Z|0-9]~i',"_",$name).' = \''.str_replace("'","\'",$object).'\';'.NL;
+			echo 'var val'.preg_replace('~[^A-Z|0-9]~i',"_",$name).' = eval("(" + object'.preg_replace('~[^A-Z|0-9]~i',"_",$name).' + ")" );'.NL;
+			
+			if ($messageType==DEBUG_TYPE_LOG)
+				echo 'console.debug(val'.preg_replace('~[^A-Z|0-9]~i',"_",$name).');'.NL;
+			elseif ($messageType==DEBUG_TYPE_INFO)
+				echo 'console.info(val'.preg_replace('~[^A-Z|0-9]~i',"_",$name).');'.NL;
+			elseif ($messageType==DEBUG_TYPE_WARN)
+				echo 'console.warn(val'.preg_replace('~[^A-Z|0-9]~i',"_",$name).');'.NL;	
+			elseif ($messageType==DEBUG_TYPE_ERR)
+				echo 'console.error(val'.preg_replace('~[^A-Z|0-9]~i',"_",$name).');'.NL;	
+		} else {
+			if ($messageType==DEBUG_TYPE_LOG)
+				echo 'console.debug("'.str_replace('"','\"',$var).'");'.NL;
+			elseif ($messageType==DEBUG_TYPE_INFO)
+				echo 'console.info("'.str_replace('"','\"',$var).'");'.NL;
+			elseif ($messageType==DEBUG_TYPE_WARN)
+				echo 'console.warn("'.str_replace('"','\"',$var).'");'.NL;	
+			elseif ($messageType==DEBUG_TYPE_ERR)
+				echo 'console.error("'.str_replace('"','\"',$var).'");'.NL;	
+		}
+	}
+	echo '</script>'.NL;
+}
+
+
 
 /* End of file welcome.php */
 /* Location: ./system/application/controllers/welcome.php */
