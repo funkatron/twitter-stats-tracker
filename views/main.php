@@ -8,13 +8,13 @@
 
 			<div id="nav">
 				<ul>
-					<li><a href="<?=site_url()?>/main/lasthour">Last Hour &raquo;</a></li>
-					<li><a href="<?=site_url()?>/main/lastday">Last Day &raquo;</a></li>
-					<li><a href="<?=site_url()?>/main/lastweek">Last Week &raquo;</a></li>
-					<li><a href="<?=site_url()?>/main/last30days">Last 30 days &raquo;</a></li>
-					<li><a href="<?=site_url()?>/main/last90days">Last 90 days &raquo;</a></li>
-					<li><a href="<?=site_url()?>/main/last180days">Last 180 days &raquo;</a></li>
-					<li><a href="<?=site_url()?>/main/all">All time &raquo;</a></li>
+					<li><a href="<?=site_url()?>lasthour">Last Hour &raquo;</a></li>
+					<li><a href="<?=site_url()?>lastday">Last Day &raquo;</a></li>
+					<li><a href="<?=site_url()?>lastweek">Last Week &raquo;</a></li>
+					<li><a href="<?=site_url()?>last30days">Last 30 days &raquo;</a></li>
+					<li><a href="<?=site_url()?>last90days">Last 90 days &raquo;</a></li>
+					<li><a href="<?=site_url()?>last180days">Last 180 days &raquo;</a></li>
+					<li><a href="<?=site_url()?>all">All time &raquo;</a></li>
 				</ul>
 			</div>
 
@@ -24,7 +24,7 @@
 			<?php endif ?>
 		
 	
-			<div id="chart"><img src="<?php echo $gchart_url?>" /></div>
+			<div id="chart"><a href="<?php echo $gchart_url?>" target="_blank"><img src="<?php echo $gchart_url?>" border="0" /></a></div>
 
 			<form onsubmit="return false;" id="searchform">
 				<label for="search_app_name">Search app name</label>

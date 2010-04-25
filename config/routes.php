@@ -43,8 +43,21 @@
 $route['default_controller'] = "main";
 $route['scaffolding_trigger'] = "";
 
-$route['lasthour'] = 'main/lasthour';
+$route['lasthour']    = 'main/lasthour';
+$route['lastday']     = 'main/lastday';
+$route['lastweek']    = 'main/lastweek';
+$route['last30days']  = 'main/last30days';
+$route['last90days']  = 'main/last90days';
+$route['last180days'] = 'main/last180days';
+$route['all']         = 'main/all';
 
+$route['lasthour.json']    = 'main/lasthour/json';
+$route['lastday.json']     = 'main/lastday/json';
+$route['lastweek.json']    = 'main/lastweek/json';
+$route['last30days.json']  = 'main/last30days/json';
+$route['last90days.json']  = 'main/last90days/json';
+$route['last180days.json'] = 'main/last180days/json';
+$route['all.json']         = 'main/all/json';
 
 /* End of file routes.php */
 /* Location: ./system/application/config/routes.php */

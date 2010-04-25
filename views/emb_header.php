@@ -22,7 +22,7 @@
 	<script type="text/javascript" charset="utf-8">
 	var grid;
 	var dataView;
-	var sortcol = "source";
+	var sortcol = "rank";
 	var sortdir = 1;
 	var searchString = "";
 	var data = [], rows = [];
@@ -38,15 +38,23 @@
 	?>
 	<?$x=1;?>
 	<?foreach($data->results as $result):?>
-	data.push({ "id":"<?='id_'.$x;?>", "rank":"<?=$x++;?>", "link":"<?=$result->link?>", "source":"<?=$result->source?>", "percent":"<?=number_format(($result->count/$data->total)*100, 3)?>"});
+	data.push({ "id":"<?='id_'.$x;?>", "rank":"<?=$x++;?>", "link":"<?=$result->link?>", "source":"<?=htmlspecialchars($result->source, ENT_QUOTES, 'UTF-8')?>", "percent":"<?=number_format(($result->count/$data->total)*100, 3)?>"});
 	<?endforeach;?>
 	
 
 	function myFilter(item) {
-		if (searchString != "" && item["source"].indexOf(searchString) == -1) {
-			return false;
+		if (searchString == "") {
+			return true;
+		} else {
+			// if (console && console.log) {
+			// 	if (item["source"].indexOf(searchString) > -1)
+			// 		console.log("'"+searchString+"'", "'"+item['source']+"'", item["source"].indexOf(searchString));
+			// }
+			if (item["source"].indexOf(searchString) < 0) {
+				return false;
+			}
+			return true;
 		}
-		return true;
 	}
 
 	function comparer(a,b) {
@@ -85,12 +93,13 @@
 	
 	
 	<script type="text/javascript" charset="utf-8">
+	
+	
 		$().ready( function() {
 
 						
 			dataView = new Slick.Data.DataView();
 			grid = new Slick.Grid($("#myGrid"), dataView.rows, columns, options);
-
 
 			grid.onSort = function(sortCol, sortAsc) {
 				sortdir = sortAsc ? 1 : -1;
@@ -130,7 +139,33 @@
 			dataView.setItems(data);
 			dataView.setFilter(myFilter);
 			dataView.endUpdate();
+			
+			
+			$(window).resize(function(e){
+				resize_grid()
+			});
+			
+			$(window).load(function(e){
+				resize_grid();
+			});
 		});
+		
+		
+		function resize_grid() {
+			var new_height;
+			var window_height = $(window).height();
+			var grid_height = $('#myGrid').position().top + $('#myGrid').outerHeight();
+			if (window_height < grid_height) {
+				new_height = ($('#myGrid').innerHeight()-(grid_height-window_height));
+				$('#myGrid').css('height', new_height);
+			}
+			if (window_height > grid_height) {
+				new_height = ($('#myGrid').innerHeight()+(window_height-grid_height));
+				$('#myGrid').css('height', new_height);
+			}
+			grid.resizeCanvas();
+		}
+		
 	</script>
 	
 </head>
