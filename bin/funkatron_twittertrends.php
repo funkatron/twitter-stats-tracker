@@ -67,6 +67,6 @@ $json_counts = file_get_contents($url);
 // 
 // // $json_counts = strip_tags(stripslashes($json_counts));
 // 
-// file_put_contents('/var/www/funkatron.com/htdocs/twitter-trends.json', $json_counts);
+// file_put_contents('/var/www/twittersource.info/htdocs/twitter-trends.json', $json_counts);
 
 

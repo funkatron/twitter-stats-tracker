@@ -45,7 +45,7 @@ $json_counts = json_encode($counts);
 
 // $json_counts = strip_tags(stripslashes($json_counts));
 
-file_put_contents('/var/www/funkatron.com/htdocs/twitter-source-stats.json', $json_counts);
+file_put_contents('/var/www/twittersource.info/htdocs/twitter-source-stats.json', $json_counts);
 
 // echo "<pre>"; echo print_r($http->getResponseMessage(), true); echo "</pre>";
 // echo "<pre>"; echo print_r($json, true); echo "</pre>";

@@ -2,7 +2,7 @@
 error_reporting('on');
 class MSources extends Model {
 
-	const CACHE_PATH = "/var/www/funkatron.com/ciapp_tss/cache/";
+	const CACHE_PATH = "/var/www/twittersource.info/ciapp_tss/cache/";
 	const CACHE_DURATION = 3600;
 	
 

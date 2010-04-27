@@ -22,7 +22,6 @@ class Main extends Controller {
 
 	public function Main() {
 		parent::Controller();	
-		$this->output->cache(10);
 	}
 	
 	/**
@@ -39,9 +38,31 @@ class Main extends Controller {
 	
 	protected function _showData($json_path, $title, $send_json=false)
 	{
-		if ($send_json) {
+		$this->load->library('cache');
+		
+		$hash = md5($json_path);
+		$data_cachefile = 'data_'.$hash;
+		$html_cachefile = 'html_'.$hash;
+		$json_cachefile = 'json_'.$hash;
+		
+		/*
+			get the raw JSON data
+		*/
+		if (!$data = $this->cache->get($data_cachefile)) {
 			$data = json_decode(file_get_contents($json_path));
-			$json = $this->load->view('main_json', array('data' => $data), true);
+			$this->cache->write($data, $data_cachefile);
+		}
+		
+		
+		if ($send_json) {
+			if (!$json = $this->cache->get($json_cachefile)) {
+				$json = $this->load->view('main_json', array('data' => $data), true);
+				$this->cache->write($json, $json_cachefile);
+				$this->output->set_header('X-JSON-CACHED: false');
+			} else {
+				$this->output->set_header('X-JSON-CACHED: true');
+			}
+
 			$this->output->set_header("HTTP/1.0 ".$status);
 			$this->output->set_header("HTTP/1.1 ".$status);
 			$this->output->set_header(self::HTTP_CONTENT_TYPE_JSON);
@@ -49,13 +70,21 @@ class Main extends Controller {
 			return;
 		}
 		
-		$data = json_decode(file_get_contents($json_path));
+		if (!$html = $this->cache->get($html_cachefile)) {
+			
 		
-		$view_data['gchart_url'] = $this->_getGchartURL($data);
-		$view_data['data'] = $data;
-		$view_data['page_title']  = self::PAGE_TITLE.": ".$title;
+			$view_data['gchart_url'] = $this->_getGchartURL($data);
+			$view_data['data'] = $data;
+			$view_data['page_title']  = self::PAGE_TITLE.": ".$title;
 		
-		$this->load->view('main', $view_data);
+			$html = $this->load->view('main', $view_data, true);
+			$this->cache->write($html, $html_cachefile);
+			$this->output->set_header('X-HTML-CACHED: false');
+		} else {
+			$this->output->set_header('X-HTML-CACHED: true');
+		}
+		$this->output->set_output($html);
+		return;
 	}
 	
 	public function lasthour($format=false)

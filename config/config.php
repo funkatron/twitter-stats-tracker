@@ -11,7 +11,7 @@
 |	http://example.com/
 |
 */
-$config['base_url']	= "http://funkatron.com/tss/";
+$config['base_url']	= "http://twittersource.info/";
 
 /*
 |--------------------------------------------------------------------------
@@ -184,7 +184,7 @@ $config['log_threshold'] = 0;
 | system/logs/ folder.  Use a full server path with trailing slash.
 |
 */
-$config['log_path'] = '/var/www/funkatron.com/ciapp_tss/logs/';
+$config['log_path'] = '/var/www/twittersource.info/ciapp_tss/logs/';
 
 /*
 |--------------------------------------------------------------------------
@@ -206,7 +206,7 @@ $config['log_date_format'] = 'Y-m-d H:i:s';
 | system/cache/ folder.  Use a full server path with trailing slash.
 |
 */
-$config['cache_path'] = '/var/www/funkatron.com/ciapp_tss/cache/';
+$config['cache_path'] = '/var/www/twittersource.info/ciapp_tss/cache/';
 
 /*
 |--------------------------------------------------------------------------

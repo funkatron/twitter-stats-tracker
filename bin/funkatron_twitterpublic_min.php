@@ -47,5 +47,5 @@ echo "<pre>"; echo print_r($counts, true); echo "</pre>";
 $json_counts = json_encode($counts);
 
 if ($json_counts) {
-	file_put_contents('/var/www/funkatron.com/htdocs/twitter-source-stats.json', $json_counts);
+	file_put_contents('/var/www/twittersource.info/htdocs/twitter-source-stats.json', $json_counts);
 }

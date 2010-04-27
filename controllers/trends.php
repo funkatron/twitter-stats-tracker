@@ -4,7 +4,7 @@ require_once('/var/www/shared/gChart2.php');
 
 class Trends extends Controller {
 
-	const JSON_FILE_PATH = '/var/www/funkatron.com/htdocs/twitter-source-stats.json';
+	const JSON_FILE_PATH = '/var/www/twittersource.info/htdocs/twitter-source-stats.json';
 
 	const PAGE_TITLE     = 'Twitter Trends';
 
